@@ -1,0 +1,57 @@
+body {
+    background-color: rgb(238, 238, 238);
+}
+#invest-form-container {
+    margin: auto;
+    margin-top: 10vh;
+    max-width: 470px;
+    background-color: rgb(230 208 181);
+    min-width: 290px;
+    border-radius: 7px;
+    -webkit-box-shadow: 0px 1px 8px 4px rgba(135,135,135,0.58); 
+    box-shadow: 0px 1px 8px 4px rgba(135,135,135,0.58);
+}
+#invest-form {
+    padding: 20px;
+}
+#logo-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+}
+#logo-container img {
+    width: 50px;
+}
+#brand {
+    font-family:  serif;
+    font-size: 28px;
+    margin-left: 10px;
+    margin-bottom: 0px;
+}
+#slogan-container {
+    margin: 15px 0px;
+    padding: 0px 14px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    color: #6b6b6b;
+}
+#slogan {
+    margin: 0px 8px;
+}
+.hr-div {
+    border-bottom: 1px solid rgb(177, 177, 177);
+    flex:1 1 auto;
+    margin-top: 1px;
+}
+#invest-form .title-label {
+    color: rgb(90, 90, 90);
+}
+#suggest-intro {
+    background-color: rgb(192, 214, 229);
+    border-radius: 5px;
+    padding: 15px;
+}

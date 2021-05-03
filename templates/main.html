@@ -1,0 +1,94 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Investment Strtegy - we help you invest on stocks and ETFs</title>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+
+    </head>
+    <body>
+        <div class="container">
+            <div id="invest-form-container">
+                <div id="logo-container">
+                    <div>
+                        <img src="{{url_for('static', filename='img/invest.png')}}" alt="logo">
+                    </div>
+                    <h3 id="brand">Invest Assist</h3>
+                </div>
+                <div id="slogan-container">
+                    <div class="hr-div"></div>
+                    <div id="slogan">Your best investment helper</div>
+                    <div class="hr-div"></div>
+                </div>
+                <form method="POST"  id="invest-form" action="/" onsubmit="investFormOnsubmit(event)">
+                    <div class="form-group">
+                        <label for="amount" class='title-label'>Invest Amount: (Minimum $5,000)</label>
+                        <input class="form-control" type="text" name="amount" placeholder="Your invest amount($)"/>
+                    </div>
+                    <div>
+                        <label class='title-label'>Please select your investment strategy(Up to 2)</label>
+                    </div>
+                    <div class="form-check-inline">
+                        <label class="form-check-label">
+                          <input type="checkbox" class="form-check-input" name="ethical">Ethical Investing
+                        </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="growth">Growth Investing
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="index">Index Investing
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="quality">Quality Investing
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="value">Value Investing
+                    </label>
+                    </div>
+                      <div class="form-group" style="margin-top: 12px;">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                      </div>
+                </form>
+            </div>
+            {% if items is defined %}
+                <div id="suggest-intro">Since you plan to spend <b>${{items['amount']}}</b>, and you like <b>{{items['strat1']}} investing</b>{% if items['strat2'] is defined %}
+                        and <b>{{items['strat2']}} investing{% endif %}</b>, we suggest you......
+                </div>
+                <div class="row">
+                    <div class="col-md-6" id="stock-panel">
+                        Spend ${{items['suggestion']['stock']['spend']}} on these stocks...
+                        
+                        {%for name in items['suggestion']['stock']['names'] %}
+                            <div>{{name}} panel here</div>
+                        {%endfor%}
+                    </div>
+                    <div class="col-md-6" id="etf-panel">
+                        Spend ${{items['suggestion']['ETF']['spend']}} on these ETFs...
+                        {%for name in items['suggestion']['ETF']['names'] %}
+                            <div>{{name}} panel here</div>
+                        {%endfor%}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <script src="{{url_for('static', filename='js/validation.js')}}"></script>
+    </body>
+</html>
