@@ -1,4 +1,12 @@
 import requests
+import pandas as pd
+
+def get_sp500_tickers():
+    wiki_table=pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+    df = wiki_table[0]
+    tickers = df['Symbol'].values
+    # print(tickers)
+    return tickers
 
 def getSuggestions(amount, strats):
     result={

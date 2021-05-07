@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from functions import getSuggestions, grab_all_stocks
+from functions import getSuggestions, grab_all_stocks, get_sp500_tickers
 
 app = Flask(__name__)
 
@@ -27,3 +27,4 @@ def query():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
