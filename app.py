@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from functions import getSuggestions, grab_all_stocks, get_sp500_tickers
+from functions import getSuggestions, grab_all_stocks, get_sp500_tickers, get_sp400_tickers, get_sp600_tickers
 
 app = Flask(__name__)
 
@@ -11,7 +11,9 @@ def hello_world():
 
 @app.route('/', methods=['POST']) 
 def query():
-    ret = grab_all_stocks()
+    # ret = grab_all_stocks()
+    ret = get_sp600_tickers()
+    print(ret[:20])
     # print(ret[100])
     amount = int(request.form['amount'])
     strats = request.form['strats'].split(",")
