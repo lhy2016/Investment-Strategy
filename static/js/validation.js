@@ -1,12 +1,20 @@
 
 // only 2 of investment strategies selected validation
-$("#invest-form input[type='checkbox']").change(function(e) {
+$("#invest-form input[type='checkbox'].strat").change(function(e) {
     if (e.target.checked) {
-        if ($("#invest-form input[type='checkbox']:checked").length > 2) {
+        if ($("#invest-form input[type='checkbox'].strat:checked").length > 2) {
            alert("You can only select up to 2 investment strategies!");
            e.target.checked=false;
         }
     } 
+});
+$("#invest-form input[type='checkbox'].product").change(function(e) {
+    if (!e.target.checked) {
+        if($("#invest-form input[type='checkbox'].product:checked").length == 0) {
+            alert("At least 1 investing product should be selected!");
+            e.target.checked = true;
+        }
+    }
 });
 // input textfield, only digits are allowed
 $("#invest-form input[name='amount']").on('keyup', function(e) {
@@ -31,15 +39,21 @@ $("#invest-form input[name='amount']").on('keyup', function(e) {
         e.preventDefault();
         return false;
     }
-    if (form.find("input[type='checkbox']:checked").length == 0) {
+    if (form.find("input[type='checkbox'].strat:checked").length == 0) {
         alert("You should at least pick one investment strategy!");
         e.preventDefault();
         return false;
     }
-    form.find("input[type='checkbox']:checked").each(function() {
+    form.find("input[type='checkbox'].strat:checked").each(function() {
         stratsStr += (stratsStr ? "," : "");
         stratsStr += ($(this).attr('name'));
     });
-    form.append("<input type='hidden' name='strats' value='" + stratsStr +"'>")
+    var productStr = "";
+    form.find("input[type='checkbox'].product:checked").each(function() {
+        productStr += (productStr ? ",":"");
+        productStr += ($(this).attr('name'));
+    });
+    form.append("<input type='hidden' name='strats' value='" + stratsStr +"'>");
+    form.append("<input type='hidden' name='products' value='" + productStr + "'>");
     return true;
  }

@@ -1,7 +1,28 @@
 import requests
 import pandas as pd
 
-# Medium cap stocks
+
+def getSuggestions(input):
+    strats = input["strats"].split(",")
+    products = input["products"].split(",")
+    for product in products:
+        for strat in strats:
+            handler = handlerMap[product][strat]
+            if handler != None:
+                handler()
+    
+    result={
+        "stock": {
+            "spend" : (int)(input["amount"])/3,
+            "names" : ["Google", "Apple"],
+        }, 
+        "ETF": {
+            "spend" : (int)(input["amount"])/3 * 2,
+            "names" : ["iShares U.S. Medical Devices ETF"]
+        }}
+    return result
+
+# Large cap stocks
 def get_sp500_tickers():
     wiki_table=pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
     df = wiki_table[0]
@@ -22,22 +43,17 @@ def get_sp400_tickers():
 def get_sp600_tickers():
     wiki_table=pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_600_companies')
     df = wiki_table[1]
-    print(df)
+    # print(df)
     tickers = df['Ticker symbol'].values
     # print(tickers)
     return tickers
 
-def getSuggestions(amount, strats):
-    result={
-        "stock": {
-            "spend" : amount/3,
-            "names" : ["Google", "Apple"],
-        }, 
-        "ETF": {
-            "spend" : amount/3 * 2,
-            "names" : ["iShares U.S. Medical Devices ETF"]
-        }}
-    return result
+def grab_all_stocks():
+    ret = {}
+    ret["small"] = get_sp600_tickers()
+    ret["medium"] = get_sp400_tickers()
+    ret["large"] = get_sp500_tickers()
+    return ret
 
 def value_selection(amount, stocks):
     # from the list of stocks, return top three and amount to each stocks
@@ -45,23 +61,27 @@ def value_selection(amount, stocks):
     sp500 = get_sp500_tickers()
 
     return
-    
-def grab_all_stocks():
-    api_key = '97PWgrqMl_bpqgzX9KGLEJvIaN3pq7yJ'
 
-    response1 = requests.get('https://api.polygon.io/v3/reference/tickers?market=stocks&active=true&sort=ticker&order=asc&limit=1000&apiKey=' + api_key)
-    ret = []
-    while 1:
-        data = response1.json()
-        for stock in data['results']:
-            ret.append(stock['ticker'])
+stocks = grab_all_stocks()    
 
-        if (data.__contains__('next_url')):
-            url = data['next_url']
-            response1 = requests.get(url + '&apiKey=' + api_key)
-        else:
-            # print(data['results'][-1])
-            break
-        break
-    print("Total # of stocks: " + str(len(ret)))
-    return ret
+def get_growth_stocks():
+    print(stocks)
+    return None
+
+handlerMap = {
+    "stock":{
+        "ethical": None,
+        "growth": get_growth_stocks,
+        "quality": None,
+        "index": None,
+        "value": None,
+    },
+    "etf": {
+        "ethical": None,
+        "growth": None,
+        "quality": None,
+        "index": None,
+        "value": None,
+    },
+}
+
