@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
-
+import yfinance as yf
+import time
 
 def getSuggestions(input):
     strats = input["strats"].split(",")
@@ -65,7 +66,12 @@ def value_selection(amount, stocks):
 stocks = grab_all_stocks()    
 
 def get_growth_stocks():
-    print(stocks)
+    small = stocks['small']
+    tickerList = ""
+    for i in range(1):
+        test = "AMZN"
+        stock = yf.Ticker(test)
+        print(stock.earnings)
     return None
 
 handlerMap = {
