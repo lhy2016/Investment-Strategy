@@ -86,19 +86,24 @@
                         and <b>{{items['strat2']}} investing{% endif %}</b>, we suggest you......
                 </div>
                 <div class="row">
+                    {% if 'stock' in items['suggestion'] %}
                     <div class="col-md-6" id="stock-panel">
                         Spend ${{items['suggestion']['stock']['spend']}} on these stocks...
                         
                         {%for name in items['suggestion']['stock']['names'] %}
                             <div>{{name}} panel here</div>
                         {%endfor%}
+
                     </div>
+                    {% endif %}
+                    {% if 'ETF' in items['suggestion'] %}
                     <div class="col-md-6" id="etf-panel">
                         Spend ${{items['suggestion']['ETF']['spend']}} on these ETFs...
                         {%for name in items['suggestion']['ETF']['names'] %}
                             <div>{{name}} panel here</div>
                         {%endfor%}
                     </div>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>

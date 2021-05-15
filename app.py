@@ -1,11 +1,16 @@
 from flask import Flask, render_template, request
 from functions import getSuggestions
+from stockService import update
+from concurrent.futures import ThreadPoolExecutor
 
+executor = ThreadPoolExecutor(1)
 app = Flask(__name__)
+
 
 @app.route('/')
 def hello_world():
     return render_template('main.html')
+
 
 @app.route('/', methods=['POST']) 
 def query():
@@ -23,6 +28,7 @@ def query():
     return render_template('main.html', items=viewItems)
 
 if __name__ == '__main__':
+    executor.submit(update)
     app.run(debug=True)
     
     
