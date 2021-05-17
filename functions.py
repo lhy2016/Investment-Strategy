@@ -1,8 +1,10 @@
 import requests
+from random import randrange
 import pandas as pd
 import yfinance as yf
 import time
 from stockService import stocks
+
 
 def getSuggestions(input):
     strats = input["strats"].split(",")
@@ -35,6 +37,7 @@ def value_selection(amount, stocks):
 
     return
 
+stocks = grab_all_stocks()    
 
 def get_growth_stocks(input):
     result={
@@ -47,13 +50,43 @@ def get_growth_stocks(input):
     result["stock"]["names"] = temp
     return result
 
+def get_value_stocks():
+    # from the list of stocks, return top three and amount to each stocks
+    # select from large cap stocks and choose one that suffered drop recently or traded sideways for a while
+    val_stock = []
+    index = randrange(500)
+    sp500 = stocks['large']
+    cnt = 0
+    visited = []
+    while len(val_stock) < 10:
+        visited.append(index)
+        s = sp500[index]
+        info = yf.Ticker(s).info
+        value_tick = 0
+        if 'profitMargins' in info and info['profitMargins'] is not None and info['profitMargins'] >= 0.2:
+            value_tick += 1
+        if 'priceToBook' in info and info['priceToBook'] is not None and info['priceToBook'] <= 3:
+            value_tick += 1
+        if 'dividendRate' in info and info['dividendRate'] is not None:
+            value_tick += 1
+            
+        # try to calculate eps
+        
+        if value_tick >= 2:
+            val_stock.append(s)
+        while index in visited:
+            # print(visited, index)
+            index = randrange(500)
+        index += 1
+    return val_stock
+
 handlerMap = {
     "stock":{
         "ethical": None,
         "growth": get_growth_stocks,
         "quality": None,
         "index": None,
-        "value": None,
+        "value": get_value_stocks,
     },
     "etf": {
         "ethical": None,
