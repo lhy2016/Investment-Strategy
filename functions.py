@@ -85,7 +85,7 @@ def get_value_stocks(input):
 
 def get_value_eft(input):
     ret={
-        "etf": {
+        "ETF": {
             "names" : [],
         },
     }
@@ -99,9 +99,9 @@ def get_value_eft(input):
     useStock = 'stock' in products
     useETF = 'etf' in products
     if (useStock and useETF) :
-        ret['etf']['names'] = ['VTV'][:]
+        ret['ETF']['names'] = ['VTV'][:]
     elif (useETF):
-        ret['etf']['names'] =  etf[:]
+        ret['ETF']['names'] =  etf[:]
 
     return ret
 
