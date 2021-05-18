@@ -56,24 +56,21 @@ def update():
                 tickers = [x for x in tickers if x not in delisted]
                 tickerStr = " ".join(tickers)
 
-
                 data = yf.download(tickerStr, period="1y", interval="1wk",threads=True, group_by='tickers')
                 for ticker in tickers:
                     stocks[ticker] = {}
                     updated = data.loc[:, (ticker, "High")].dropna()
                     if(len(updated) > 0):
-                        
                         stocks[ticker]["history"] = updated
                         tickerObj = yf.Ticker(ticker)
                         stocks[ticker]["quarterly_earnings"] = tickerObj.quarterly_earnings
                         stocks[ticker]["info"] = tickerObj.info
-                    else:
-                        del stocks[ticker]
-
+                        stocks[ticker]["earnings"] = tickerObj.earnings
                 print("initialization finished!")
+
             elif stocks["date"] != todayStr:
                 stocks["date"] = todayStr
-                for ticker in stocks:
+                for ticker in stocks.keys():
                     if ticker != "date":
                         tickerObj = yf.Ticker(ticker)
                         updated = tickerObj.history(period="1y", interval="1wk")
@@ -81,6 +78,7 @@ def update():
                             stocks[ticker]["history"] = updated
                             stocks[ticker]["quarterly_earnings"] = tickerObj.quarterly_earnings
                             stocks[ticker]["info"] = tickerObj.info
+                            stocks[ticker]["earnings"] = tickerObj.earnings
                         else:
                             del stocks[ticker]
         time.sleep(3600)

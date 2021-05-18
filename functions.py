@@ -40,11 +40,34 @@ def get_growth_stocks(input):
     result={
         "stock": {
             "names" : [],
+            "measures" : [],
         },
     }
-    temp = list(stocks.keys())
-    temp = temp[:5]
-    result["stock"]["names"] = temp
+    # msft = yf.Ticker("MSFT")
+    # test = msft.earnings
+    # print(test)
+    # for i in range(4):
+    #     print("i: ", i)
+    #     print(test.iloc[-(i+1)]['Earnings'])
+    for ticker in [key for key in stocks.keys() if key != "date"]:
+        if "earnings" in stocks[ticker]:
+            earnings = stocks[ticker]["earnings"]
+            years = 3
+            if len(earnings) >= years+1:
+                qualified = True
+                rateSum = 0.0
+                for i in range(years):
+                    prevYear = (int)(earnings.iloc[-(i+1)]['Earnings'])
+                    prevPrev = (int)(earnings.iloc[-(i+2)]['Earnings'])
+                    if (prevYear - prevPrev) / prevPrev < 0.15:
+                        qualified = False
+                        break
+                    else:
+                        rateSum += ((prevYear - prevPrev) / prevPrev)
+                if qualified:
+                    result["stock"]["names"].append(ticker)
+                    result["stock"]["measures"].append(rateSum/years)
+    print(result)
     return result
 
 handlerMap = {
