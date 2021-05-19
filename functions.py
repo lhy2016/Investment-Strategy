@@ -323,6 +323,8 @@ def get_index_stocks(input):
     for s in sort_stocks:
         if len(selected_tickers) <=2:
             selected_tickers.append(s[0])
+            if (s[1] == 0):
+                measures.append(0.00001) 
             measures.append(s[1])  
     print (selected_tickers) 
     print (measures)      
@@ -336,16 +338,14 @@ def get_index_stocks(input):
     elif (useStock):
         res["stock"]["names"] = selected_tickers
         res["stock"]["measures"] =  measures
-    else:
-        res["stock"]["names"] = []
-        res["stock"]["measures"] = []
     print (res)
     return res
 
-def get_index_eft(input):
+def get_index_etfs(input):
     res={
-        "etf": {
+        "ETF": {
             "names" : [],
+            "measures" : [],
         },
     }
     '''
@@ -355,11 +355,18 @@ def get_index_eft(input):
     IVV: expense ratio = 0.03%
     '''
     etf = ['VOO', 'SPY', 'IVV']
+    measures = [0.0003, 0.0009, 0.0003]
     products = input['products'].split(',')
     useStock = 'stock' in products
     useETF = 'etf' in products
-    return res
-
+    if (useStock and useETF) :
+        res["ETF"]["names"] = etf[2:]
+        res["ETF"]["measures"] =  measures[2:]
+    elif (useETF):
+        res["ETF"]["names"] = etf
+        res["ETF"]["measures"] = measures
+    print (res)
+    return res    
 
 handlerMap = {
     "stock":{
@@ -373,7 +380,7 @@ handlerMap = {
         "ethical": get_ethical_etfs,
         "growth": None,
         "quality": None,
-        "index": get_index_eft,
+        "index": get_index_etfs,
         "value": get_value_eft,
     },
 }
