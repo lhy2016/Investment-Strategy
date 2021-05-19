@@ -5,6 +5,7 @@ import pandas as pd
 import yfinance as yf
 import time
 from stockService import stocks, update
+import investpy as ipy
 
 
 def getSuggestions(input):
@@ -28,6 +29,30 @@ def getSuggestions(input):
         result[key]["spend"] = (int)(input["amount"]) / len(result.keys())
     return result
 
+
+def get_etf_names_by_symbols(symbolList):
+    allETFs = ipy.get_etfs_dict(columns=["name","symbol"])
+    result = [None]*len(symbolList)
+    for obj in allETFs:
+        if obj['symbol'] in symbolList:
+            index = symbolList.index(obj['symbol'])
+            result[index] = obj['name']
+    return [x for x in result if x != None]
+    
+    
+def get_growth_etfs(input):
+    result={
+        "ETF": {
+            "names" : [],
+            "measures" : [],
+        },
+    }
+ 
+    etf = ["TQQQ", "TECL", "ROM", "ARKG", "SOXL", "QLD", "ARKW", "ARKK", "IBUY", "FBGX", "FLGE", "FRLG", "ARKQ", "SMOG", "XSD", "SMH", "USD", "SOXX", "CURE", "UCC", "XITK", "PTF", "PSI", "PSJ", "VGT"]
+    names = get_etf_names_by_symbols(etf)
+    print(names)
+    return result
+
 def get_growth_stocks(input):
     result={
         "stock": {
@@ -35,12 +60,6 @@ def get_growth_stocks(input):
             "measures" : [],
         },
     }
-    # msft = yf.Ticker("MSFT")
-    # test = msft.earnings
-    # print(test)
-    # for i in range(4):
-    #     print("i: ", i)
-    #     print(test.iloc[-(i+1)]['Earnings'])
     for ticker in [key for key in stocks.keys() if key != "date"]:
         if "earnings" in stocks[ticker]:
             earnings = stocks[ticker]["earnings"]
@@ -59,7 +78,6 @@ def get_growth_stocks(input):
                 if qualified:
                     result["stock"]["names"].append(ticker)
                     result["stock"]["measures"].append(rateSum/years)
-    print(result)
     return result
 
 def get_value_stocks(input):
@@ -253,7 +271,7 @@ handlerMap = {
     },
     "etf": {
         "ethical": None,
-        "growth": None,
+        "growth": get_growth_etfs,
         "quality": None,
         "index": get_index_eft,
         "value": get_value_eft,
