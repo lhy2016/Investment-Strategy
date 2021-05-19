@@ -1,3 +1,4 @@
+from numpy.testing._private.utils import measure
 import requests
 import random
 import pandas as pd
@@ -165,19 +166,96 @@ def get_value_eft(input):
         ret['ETF']['names'] = measures[:]
     return ret
 
+def get_index_stocks(input):
+    res = {}
+    '''
+    For index strategy, we are using annualReportExpenseRatio as metric. The lower the expenseRatio, the better the stock.
+
+    source: 
+    https://www.forbes.com/advisor/retirement/best-total-stock-market-index-funds/
+    https://www.bankrate.com/investing/best-index-funds/
+    The following index fund are good index stocks because they have low expense ratio and considerable 5 year return
+    FNILX
+    SWPPX
+    SWTSX
+    VTSAX
+    FZROX
+    FSKAX
+    VRTTX
+    WFIVX
+    '''
+    tickers = ['FNILX', 'SWPPX', 'SWTSX', 'VTSAX', 'FZROX', 'FSKAX', 'VRTTX', 'WFIVX']
+    #tickers = list(stocks.keys())
+    print (tickers)
+
+    products = input['products'].split(',')
+    useStock = 'stock' in products
+    useETF = 'etf' in products
+
+    selected_tickers = []
+    measures = []
+    stock_dic = {}
+    for ticker in tickers:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        if 'annualReportExpenseRatio' in info and info['annualReportExpenseRatio'] is not None:
+            print (f'ticker has annualReportExpenseRatio: {ticker}, annualReportExpenseRatio is {info["annualReportExpenseRatio"]}')
+            if info['annualReportExpenseRatio'] <= 0.01:
+                stock_dic[ticker] = info['annualReportExpenseRatio']
+            
+    sort_stocks = sorted(stock_dic.items(), key=lambda x: x[1])
+    for s in sort_stocks:
+        if len(selected_tickers) <=2:
+            selected_tickers.append(s[0])
+            measures.append(s[1])  
+    print (selected_tickers) 
+    print (measures)      
+
+    print (f'number of select tickers is {len(selected_tickers)}')
+    if (useStock and useETF) :
+        selected_tickers.pop()
+        measures.pop()
+        res["stock"] = { "names": selected_tickers}
+        res["stock"] = { "measures": measures}
+    elif (useStock):
+        res["stock"] = { 'names': selected_tickers}
+        res["stock"] = { 'measures': measures}
+    else:
+        res["stock"] = { "names": []}
+        res["stock"] = { "measures": []}
+    return res
+
+def get_index_eft(input):
+    res={
+        "etf": {
+            "names" : [],
+        },
+    }
+    '''
+    source: https://www.bankrate.com/investing/best-index-funds/
+    VOO: expense ratio = 0.03%
+    SPY: expense ratio = 0.09%
+    IVV: expense ratio = 0.03%
+    '''
+    etf = ['VOO', 'SPY', 'IVV']
+    products = input['products'].split(',')
+    useStock = 'stock' in products
+    useETF = 'etf' in products
+    return res
+
 handlerMap = {
     "stock":{
         "ethical": None,
         "growth": get_growth_stocks,
         "quality": None,
-        "index": None,
+        "index": get_index_stocks,
         "value": get_value_stocks,
     },
     "etf": {
         "ethical": None,
         "growth": None,
         "quality": None,
-        "index": None,
+        "index": get_index_eft,
         "value": get_value_eft,
     },
 }
