@@ -278,7 +278,12 @@ def get_ethical_etfs(input):
 
 
 def get_index_stocks(input):
-    res = {}
+    res = {
+        "stock": {
+            "names" : [],
+            "measures" : [],
+        },
+    }
     '''
     For index strategy, we are using annualReportExpenseRatio as metric. The lower the expenseRatio, the better the stock.
 
@@ -326,14 +331,15 @@ def get_index_stocks(input):
     if (useStock and useETF) :
         selected_tickers.pop()
         measures.pop()
-        res["stock"] = { "names": selected_tickers}
-        res["stock"] = { "measures": measures}
+        res["stock"]["names"] = selected_tickers
+        res["stock"]["measures"] =  measures
     elif (useStock):
-        res["stock"] = { 'names': selected_tickers}
-        res["stock"] = { 'measures': measures}
+        res["stock"]["names"] = selected_tickers
+        res["stock"]["measures"] =  measures
     else:
-        res["stock"] = { "names": []}
-        res["stock"] = { "measures": []}
+        res["stock"]["names"] = []
+        res["stock"]["measures"] = []
+    print (res)
     return res
 
 def get_index_eft(input):
