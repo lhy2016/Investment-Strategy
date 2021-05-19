@@ -166,6 +166,117 @@ def get_value_eft(input):
         ret['ETF']['names'] = measures[:]
     return ret
 
+
+
+def get_ethical_stocks(input):
+    '''
+    Choose 3 stocks from the top 10 companies that have made great efforts for the environment
+    https://www.forbes.com/sites/justcapital/2019/04/22/the-top-33-companies-for-the-environment-by-industry/?sh=7bee72ce6461
+    '''
+    result={
+        "stock": {
+            "names" : [],
+            "measures" : [],
+        },
+    }
+
+
+    # result["stock"]["names"].append('MSFT')
+    # print(stocks.keys())
+    # print(stocks['date'])
+    # for x, y in stocks.items():
+    #     print("key")
+    #     print(x)
+    #     print("value")
+    #     print(y)
+
+    
+    ethical_stock_tickers_top10 = ['MSFT', 'INTC', 'GOOGL', 'IBM', 'ACN', 'T', 'GM', 'GIS', 'AAPL', 'RMD']
+
+    # recommendation score = 10 * past year percentage change + 5 * past 6-month percentage change + 3 * past 3-month percentage change
+    recommendation_score_list = {}
+    for ticker in ethical_stock_tickers_top10:
+        tk = yf.Ticker(ticker)
+        history = tk.history(period='1y')
+        today_data = tk.history(period='1d')
+        current_price = round(today_data['Close'][0], 2)
+        total_rows = history.shape[0] 
+        prev_year_price = history.iloc[0]['Close']
+        prev_6month_price = history.iloc[round(total_rows * 0.5)]['Close']
+        prev_3month_price = history.iloc[round(total_rows * 0.75)]['Close']         
+        past_year_percetage_change = (current_price - prev_year_price) / prev_year_price
+        past_6month_percentage_change = (current_price - prev_6month_price) / prev_6month_price 
+        past_3month_percentage_change = (current_price - prev_3month_price) / prev_3month_price 
+        recommendation_score = 10 * past_year_percetage_change +  5 * past_6month_percentage_change + 3 * past_3month_percentage_change 
+        recommendation_score_list[ticker] = recommendation_score
+    
+    # sort recommendation score in descending order
+    sorted_recommendation_score_list= sorted(recommendation_score_list.items(), key=lambda x: x[1], reverse=True)
+    print("sorted list")
+    print(sorted_recommendation_score_list)
+
+    # output top 3 stock recommendations
+    count = 0
+    for stock_ticker, recommendation_score in sorted(recommendation_score_list.items(), key=lambda x: x[1], reverse=True):
+        if count < 3:
+            result["stock"]["names"].append(stock_ticker)
+            count = count + 1 
+    print("ethical stocks result:")
+    print(result) 
+    
+    return result
+
+
+
+def get_ethical_etfs(input):
+    '''
+    Choose 3 stocks from the top 10 ETFs that are environmentally responsible
+    https://etfdb.com/esg-investing/environmental-issues/
+    '''
+
+    ret={
+        "ETF": {
+            "names" : [],
+        },
+    }
+
+    
+    ethical_etf_tickers_top10 = ['KGRN', 'ACES', 'ICLN', 'TAN', 'SMOG', 'CTEC', 'QCLN', 'RNRG', 'FAN', 'SDG']
+
+    # recommendation score = 10 * past year percentage change + 5 * past 6-month percentage change + 3 * past 3-month percentage change
+    recommendation_score_list = {}
+    for ticker in ethical_etf_tickers_top10:
+        tk = yf.Ticker(ticker)
+        history = tk.history(period='1y')
+        today_data = tk.history(period='1d')
+        current_price = round(today_data['Close'][0], 2)
+        total_rows = history.shape[0] 
+        prev_year_price = history.iloc[0]['Close']
+        prev_6month_price = history.iloc[round(total_rows * 0.5)]['Close']
+        prev_3month_price = history.iloc[round(total_rows * 0.75)]['Close']         
+        past_year_percetage_change = (current_price - prev_year_price) / prev_year_price
+        past_6month_percentage_change = (current_price - prev_6month_price) / prev_6month_price 
+        past_3month_percentage_change = (current_price - prev_3month_price) / prev_3month_price 
+        recommendation_score = 10 * past_year_percetage_change +  5 * past_6month_percentage_change + 3 * past_3month_percentage_change 
+        recommendation_score_list[ticker] = recommendation_score
+    
+    # sort recommendation score in descending order
+    sorted_recommendation_score_list= sorted(recommendation_score_list.items(), key=lambda x: x[1], reverse=True)
+    print("sorted list")
+    print(sorted_recommendation_score_list)
+
+    # output top 3 ETF recommendations
+    count = 0
+    for etf_ticker, recommendation_score in sorted(recommendation_score_list.items(), key=lambda x: x[1], reverse=True):
+        if count < 3:
+            ret["ETF"]["names"].append(etf_ticker)
+            count = count + 1 
+    print("ethical ETFs result:")
+    print(ret) 
+    
+    return ret
+
+
 def get_index_stocks(input):
     res = {}
     '''
@@ -243,16 +354,17 @@ def get_index_eft(input):
     useETF = 'etf' in products
     return res
 
+
 handlerMap = {
     "stock":{
-        "ethical": None,
+        "ethical": get_ethical_stocks,
         "growth": get_growth_stocks,
         "quality": None,
         "index": get_index_stocks,
         "value": get_value_stocks,
     },
     "etf": {
-        "ethical": None,
+        "ethical": get_ethical_etfs,
         "growth": None,
         "quality": None,
         "index": get_index_eft,
