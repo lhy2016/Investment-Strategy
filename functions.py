@@ -65,9 +65,15 @@ def get_value_stocks(input):
     # from the list of stocks, return top three and amount to each stocks
     # select from large cap stocks and choose one that suffered drop recently or traded sideways for a while
     val_stock = []
-
+    measures = [0, 0, 0]
+    pegRatio = []
     visited = []
-    ret = {}
+    ret={
+        "stock": {
+            "names" : [],
+            "measures" : [],
+        },
+    }
     ticker = random.choice(list(stocks.keys()))
     products = input['products'].split(',')
     useStock = 'stock' in products
@@ -94,22 +100,51 @@ def get_value_stocks(input):
                             
                 if value_tick >= 2:
                     val_stock.append(ticker)
+                    if 'pegRatio' in info and info['pegRatio'] is not None:
+                        pegRatio.append(info['pegRatio'])
+                    else:
+                        pegRatio.append(99999999999)
+
+                    # measures.append(value_tick)
         while ticker in visited:
             ticker = random.choice(list(stocks.keys()))
+    """
+        determin allocation of stocks
+        stocks with smallest peg is given most allocation
+        other are equally allocated
+    """
+    smallestPeg = min(pegRatio)
+    indexSmallestPeg = pegRatio.index(smallestPeg)
+            
     if (useStock and useETF) :
-        val_stock.pop()
-        ret['stock'] = { 'names': val_stock}
+        if smallestPeg == 99999999999:
+            measures = [0.25, 0.25, 0.25]
+        else:
+            for i in range(len(measures)):
+                if i == indexSmallestPeg:
+                    measures[i] = 0.35
+                else:
+                    measures[i] = 0.2
+        ret['stock']['names'] =  val_stock
+        ret['stock']['measures'] = measures[:]
     elif (useStock):
-        ret['stock'] = { 'names': val_stock}
-    else:
-        ret['stock'] = {'names':[]}
-
+        if smallestPeg == 99999999999:
+            measures = [0.25, 0.25, 0.25]
+        else:
+            for i in range(measures):
+                if i == indexSmallestPeg:
+                    measures[i] = 0.7
+                else:
+                    measures[i] = 0.15
+        ret['stock']['names'] =  val_stock
+        ret['stock']['measures'] = measures[:]
     return ret
 
 def get_value_eft(input):
     ret={
         "ETF": {
             "names" : [],
+            "measures" : [],
         },
     }
     """
@@ -118,14 +153,16 @@ def get_value_eft(input):
         SPY tracks SP500 which is always good value
     """
     etf = ['VYM', 'VTV', 'SPY']
+    measures = [0.25, 0.5, 0.25]
     products = input['products'].split(',')
     useStock = 'stock' in products
     useETF = 'etf' in products
     if (useStock and useETF) :
         ret['ETF']['names'] = ['VTV'][:]
+        ret['ETF']['measures'] = [0.25]
     elif (useETF):
         ret['ETF']['names'] =  etf[:]
-
+        ret['ETF']['names'] = measures[:]
     return ret
 
 handlerMap = {
