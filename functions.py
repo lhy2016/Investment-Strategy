@@ -396,7 +396,7 @@ handlerMap = {
     },
     "etf": {
         "ethical": get_ethical_etfs,
-        "growth": None,
+        "growth": get_growth_etfs,
         "quality": None,
         "index": get_index_etfs,
         "value": get_value_eft,
