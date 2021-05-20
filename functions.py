@@ -6,6 +6,7 @@ import yfinance as yf
 import time
 from stockService import stocks, update
 import investpy as ipy
+from datetime import datetime
 
 
 def getSuggestions(input):
@@ -79,6 +80,20 @@ def get_growth_stocks(input):
                     result["stock"]["names"].append(ticker)
                     result["stock"]["measures"].append(rateSum/years)
     return result
+"""
+    Only for stocks for now
+"""
+def get_history(name):
+    history = []
+    series = stocks[name]['history']
+
+    if series is not None:
+        for (index, price) in enumerate(series[::-1]):
+            x = series.iloc[[index]]
+            date = x.index.date[0].strftime("%m-%d-%Y")
+            history.append([date, price])
+    h = history[::-1]
+    return h
 
 def get_value_stocks(input):
     # from the list of stocks, return top three and amount to each stocks
@@ -91,8 +106,10 @@ def get_value_stocks(input):
         "stock": {
             "names" : [],
             "measures" : [],
+            "history": {}
         },
     }
+    # print(stocks)
     ticker = random.choice(list(stocks.keys()))
     products = input['products'].split(',')
     useStock = 'stock' in products
@@ -119,6 +136,7 @@ def get_value_stocks(input):
                             
                 if value_tick >= 2:
                     val_stock.append(ticker)
+                    ret['stock']['history'][ticker] = get_history(ticker)
                     if 'pegRatio' in info and info['pegRatio'] is not None:
                         pegRatio.append(info['pegRatio'])
                     else:
@@ -150,13 +168,14 @@ def get_value_stocks(input):
         if smallestPeg == 99999999999:
             measures = [0.25, 0.25, 0.25]
         else:
-            for i in range(measures):
+            for i in range(len(measures)):
                 if i == indexSmallestPeg:
                     measures[i] = 0.7
                 else:
                     measures[i] = 0.15
         ret['stock']['names'] =  val_stock
         ret['stock']['measures'] = measures[:]
+    # print(ret)
     return ret
 
 def get_value_eft(input):
@@ -164,6 +183,7 @@ def get_value_eft(input):
         "ETF": {
             "names" : [],
             "measures" : [],
+            "history": {}
         },
     }
     """
@@ -179,9 +199,12 @@ def get_value_eft(input):
     if (useStock and useETF) :
         ret['ETF']['names'] = ['VTV'][:]
         ret['ETF']['measures'] = [0.25]
+        ret['ETF']['history'] = {'VTV':[[10, '1/02/2021'], [2, '1/02/2021'], [100, '1/02/2021'], [30, '1/02/2021'], [10, '1/02/2021']]}
     elif (useETF):
         ret['ETF']['names'] =  etf[:]
-        ret['ETF']['names'] = measures[:]
+        ret['ETF']['measures'] = measures[:]
+        ret['ETF']['history'] = {'VYM': [], 'VTV': [], 'SPY': []}
+    # print(ret)
     return ret
 
 
