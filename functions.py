@@ -105,6 +105,26 @@ def get_history(name):
             history.append([date, price])
     h = history[::-1]
     return h
+"""
+    Pass in etf name
+    returns array formatted for chart.js
+"""
+def get_eft_history(name):
+    history = []
+    date = datetime.now().date()
+    curr_date = "{}/{}/{}".format("{0:0=2d}".format(date.day), "{0:0=2d}".format(date.month), "{0:0=2d}".format(date.year))
+    df = ipy.etfs.get_etf_historical_data(etf=name,
+                                        country='United States',
+                                        from_date='09/01/2020',
+                                        to_date=curr_date, interval="Weekly")
+    if df is not None:
+        for (index, price) in enumerate(df[::-1]):
+            x = df.iloc[[index]]
+            date = x.index.date[0].strftime("%m-%d-%Y")
+            pr = x.loc[date, "High"]
+            history.append([date, pr])
+    h = history[::-1]
+    return h
 
 def get_value_stocks(input):
     # from the list of stocks, return top three and amount to each stocks
@@ -203,6 +223,9 @@ def get_value_eft(input):
         SPY tracks SP500 which is always good value
     """
     etf = ['VYM', 'VTV', 'SPY']
+    full_etf = get_etf_names_by_symbols(etf)
+    vtv = get_etf_names_by_symbols(['VTV'])
+
     measures = [0.25, 0.5, 0.25]
     products = input['products'].split(',')
     useStock = 'stock' in products
@@ -210,12 +233,21 @@ def get_value_eft(input):
     if (useStock and useETF) :
         ret['ETF']['names'] = ['VTV'][:]
         ret['ETF']['measures'] = [0.25]
-        ret['ETF']['history'] = {'VTV':[[10, '1/02/2021'], [2, '1/02/2021'], [100, '1/02/2021'], [30, '1/02/2021'], [10, '1/02/2021']]}
+        final_hist = {}
+        for i in vtv:
+            tmp_hist = get_eft_history(i)
+            final_hist['VTV'] = tmp_hist
+        # print(final_hist)
+        ret['ETF']['history'] = final_hist
     elif (useETF):
         ret['ETF']['names'] =  etf[:]
         ret['ETF']['measures'] = measures[:]
-        ret['ETF']['history'] = {'VYM': [], 'VTV': [], 'SPY': []}
-    # print(ret)
+        final_hist = {}
+        for index, i in enumerate(full_etf):
+            tmp_hist = get_eft_history(i)
+            final_hist[etf[index]] = tmp_hist
+        # print(final_hist)
+        ret['ETF']['history'] = final_hist
     return ret
 
 

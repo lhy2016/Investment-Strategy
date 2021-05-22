@@ -18,7 +18,49 @@
 
     </head>
     <body>
-        <script src="{{url_for('static', filename='js/stockCharts.js')}}"></script>
+        <!-- <script src="{{url_for('static', filename='js/stockCharts.js')}}"></script> -->
+        <script>
+            function createChart2(name, type, items) {
+                var parsed = JSON.parse(items)
+                let price = [];
+                let stock_date = [];
+                if (typeof(parsed["suggestion"]) !== undefined){
+                    parsed["suggestion"][type]['history'][name].forEach((point) => {
+                        // create label
+                        stock_date.push(point[0]);
+                        // create data
+                        price.push(point[1]);
+                    });
+                }
+                let data = {
+                    labels: stock_date,
+                    datasets: [{
+                        label: `${name} Price`,
+                        backgroundColor: 'rgb(255, 99, 132)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        data: price,
+                    }]
+                }
+
+                let config = {
+                    type: 'line',
+                    data,
+                    options: {
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `${name} Price Chart`
+                            }
+                        }
+                    }
+                }
+                console.log(config);
+                new Chart(
+                    document.getElementById(name),
+                    config
+                );
+            }
+        </script>
         <div class="container">
             <div id="invest-form-container">
                 <div id="logo-container">
@@ -93,10 +135,9 @@
                         Spend ${{items['suggestion']['stock']['spend']}} on these stocks...
                         
                         {%for name in items['suggestion']['stock']['names'] %}
-                            <div>{{name}} Weekly Chart</div>
                             <canvas id={{name}} width="600" height="400"></canvas>
                             <script>
-                                createChart('{{name}}', 'stock', '{{items|tojson}}');
+                                createChart2('{{name}}', 'stock', '{{items|tojson}}');
                             </script>
                         {%endfor%}
                     </div>
@@ -105,10 +146,9 @@
                     <div class="col-md-6" id="etf-panel">
                         Spend ${{items['suggestion']['ETF']['spend']}} on these ETFs...
                         {%for name in items['suggestion']['ETF']['names'] %}
-                            <div>{{name}} Weekly Chart</div>
                             <canvas id={{name}} width="600" height="400"></canvas>
                             <script>
-                                createChart('{{name}}', 'ETF', '{{items|tojson}}');
+                                createChart2('{{name}}', 'ETF', '{{items|tojson}}');
                             </script>
                         {%endfor%}
                     </div>
