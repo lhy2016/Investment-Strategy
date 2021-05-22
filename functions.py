@@ -1,3 +1,4 @@
+from investpy.etfs import get_etf_historical_data
 from numpy.testing._private.utils import measure
 import requests
 import random
@@ -28,6 +29,7 @@ def getSuggestions(input):
                     result[temp.keys()[0]]["names"] = list(set(curTickers + toAddTickers))
     for key in result:
         result[key]["spend"] = (int)(input["amount"]) / len(result.keys())
+    print(result)
     return result
 
 
@@ -46,6 +48,7 @@ def get_growth_etfs(input):
         "ETF": {
             "names" : [],
             "measures" : [],
+            "history" : {},
         },
     }
  
@@ -59,8 +62,10 @@ def get_growth_etfs(input):
         if names[i] != None:
             result["ETF"]["names"].append(names[i])
             percent = (float)(etf[i][list(etf[i].keys())[0]].split("%")[0])
-            percent = percent / 300
+            percent = percent / 100
+            percent = pow(percent, 1/3)
             result["ETF"]["measures"].append(percent)
+            result["ETF"]["history"][names[i]] = get_eft_history(names[i])
     return result
 
 def get_growth_stocks(input):
