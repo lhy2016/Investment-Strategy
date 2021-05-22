@@ -1,13 +1,13 @@
 from investpy.etfs import get_etf_historical_data
 from numpy.testing._private.utils import measure
-import requests
 import random
 import pandas as pd
 import yfinance as yf
-import time
 from stockService import stocks, update
 import investpy as ipy
 from datetime import datetime
+import datetime as dt
+import json
 
 
 def getSuggestions(input):
@@ -112,6 +112,8 @@ def get_growth_stocks(input):
                     result["stock"]["names"].append(ticker)
                     result["stock"]["measures"].append(rateSum/years)
                     result["stock"]["history"][ticker] = get_history(ticker)
+                if len(result["stock"]["names"] == 10):
+                    break
     return result
 """
     Only for stocks for now
@@ -135,18 +137,26 @@ def get_eft_history(name):
     history = []
     date = datetime.now().date()
     curr_date = "{}/{}/{}".format("{0:0=2d}".format(date.day), "{0:0=2d}".format(date.month), "{0:0=2d}".format(date.year))
-    df = ipy.etfs.get_etf_historical_data(etf=name,
+    weekAgo = datetime.now() - dt.timedelta(days=7)
+    week_ago = "{}/{}/{}".format("{0:0=2d}".format(weekAgo.day), "{0:0=2d}".format(weekAgo.month), "{0:0=2d}".format(weekAgo.year))
+
+    jsonStr = ipy.etfs.get_etf_historical_data(etf=name,
                                         country='United States',
-                                        from_date='09/01/2020',
-                                        to_date=curr_date, interval="Weekly")
-    if df is not None:
-        for (index, price) in enumerate(df[::-1]):
-            x = df.iloc[[index]]
-            date = x.index.date[0].strftime("%m-%d-%Y")
-            pr = x.loc[date, "High"]
+                                        from_date=week_ago,
+                                        to_date=curr_date, as_json=True)
+    if jsonStr:
+        jsonObj = json.loads(jsonStr)
+        for obj in jsonObj["historical"]:
+            print(obj)
+            dateStr = obj["date"]
+            dateArr = dateStr.split("/")
+            mon = dateArr[1]
+            day = dateArr[0]
+            yr = dateArr[2]
+            date = mon + "-" + day + "-" + yr
+            pr = obj["high"]
             history.append([date, pr])
-    h = history[::-1]
-    return h
+    return history
 
 def get_value_stocks(input):
     # from the list of stocks, return top three and amount to each stocks
