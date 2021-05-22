@@ -20,18 +20,20 @@
     <body>
         <!-- <script src="{{url_for('static', filename='js/stockCharts.js')}}"></script> -->
         <script>
-            function createChart2(name, type, items) {
-                var parsed = JSON.parse(items)
+            function createChart2(name, data_json, canvasId) {              
+                var parsed = JSON.parse(data_json)
                 let price = [];
                 let stock_date = [];
-                if (typeof(parsed["suggestion"]) !== undefined){
-                    parsed["suggestion"][type]['history'][name].forEach((point) => {
+              
+                for(var i = 0; i < parsed.length;i++){
                         // create label
-                        stock_date.push(point[0]);
+                        stock_date.push(parsed[i][0]);
                         // create data
-                        price.push(point[1]);
-                    });
+                        price.push(parsed[i][1]);
+                    
                 }
+            
+                
                 let data = {
                     labels: stock_date,
                     datasets: [{
@@ -56,7 +58,7 @@
                 }
                 console.log(config);
                 new Chart(
-                    document.getElementById(name),
+                    document.getElementById(canvasId),
                     config
                 );
             }
@@ -137,7 +139,7 @@
                         {%for name in items['suggestion']['stock']['names'] %}
                             <canvas id={{name}} width="600" height="400"></canvas>
                             <script>
-                                createChart2('{{name}}', 'stock', '{{items|tojson}}');
+                                createChart2('{{name}}', '{{items["suggestion"]["stock"]["history"][name]|tojson}}', '{{name}}');
                             </script>
                         {%endfor%}
                     </div>
@@ -145,10 +147,14 @@
                     {% if 'ETF' in items['suggestion'] %}
                     <div class="col-md-6" id="etf-panel">
                         Spend ${{items['suggestion']['ETF']['spend']}} on these ETFs...
+                        <br/>
                         {%for name in items['suggestion']['ETF']['names'] %}
-                            <canvas id={{name}} width="600" height="400"></canvas>
+                            {{name}}
+                            {% set dash = "_".join(name.split(" ")) %}
+
+                            <canvas id={{dash}} width="600" height="400"></canvas>
                             <script>
-                                createChart2('{{name}}', 'ETF', '{{items|tojson}}');
+                                createChart2('{{name}}', '{{items["suggestion"]["ETF"]["history"][name]|tojson}}', '{{dash}}');
                             </script>
                         {%endfor%}
                     </div>
