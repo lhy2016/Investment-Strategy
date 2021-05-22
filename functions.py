@@ -38,7 +38,7 @@ def get_etf_names_by_symbols(symbolList):
         if obj['symbol'] in symbolList:
             index = symbolList.index(obj['symbol'])
             result[index] = obj['name']
-    return [x for x in result if x != None]
+    return result
     
     
 def get_growth_etfs(input):
@@ -49,9 +49,18 @@ def get_growth_etfs(input):
         },
     }
  
-    etf = ["TQQQ", "TECL", "ROM", "ARKG", "SOXL", "QLD", "ARKW", "ARKK", "IBUY", "FBGX", "FLGE", "FRLG", "ARKQ", "SMOG", "XSD", "SMH", "USD", "SOXX", "CURE", "UCC", "XITK", "PTF", "PSI", "PSJ", "VGT"]
-    names = get_etf_names_by_symbols(etf)
-    print(names)
+    etf = [ {"TQQQ": "267.71%"}, {"SOXL": "245.03%"}, {"TECL": "242.95%"}, 
+            {"ROM": "218.33%"}, {"ARKG": "203.18%"}, {"QLD": "200.51%"}]
+    
+    etf_symbol = [list(pair.keys())[0] for pair in etf]
+    names = get_etf_names_by_symbols(etf_symbol)
+    
+    for i in range(len(etf_symbol)):
+        if names[i] != None:
+            result["ETF"]["names"].append(names[i])
+            percent = (float)(etf[i][list(etf[i].keys())[0]].split("%")[0])
+            percent = percent / 300
+            result["ETF"]["measures"].append(percent)
     return result
 
 def get_growth_stocks(input):
@@ -59,6 +68,7 @@ def get_growth_stocks(input):
         "stock": {
             "names" : [],
             "measures" : [],
+            "history": {}
         },
     }
     for ticker in [key for key in stocks.keys() if key != "date"]:
@@ -79,6 +89,7 @@ def get_growth_stocks(input):
                 if qualified:
                     result["stock"]["names"].append(ticker)
                     result["stock"]["measures"].append(rateSum/years)
+                    result["stock"]["history"][ticker] = get_history(ticker)
     return result
 """
     Only for stocks for now
