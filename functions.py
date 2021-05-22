@@ -88,11 +88,11 @@ def get_history(name):
     series = stocks[name]['history']
 
     if series is not None:
-        for (index, price) in enumerate(series[::-1]):
+        for (index, price) in enumerate(series):
             x = series.iloc[[index]]
             date = x.index.date[0].strftime("%m-%d-%Y")
             history.append([date, price])
-    h = history[::-1]
+    h = history
     return h
 """
     Pass in etf name
@@ -101,18 +101,18 @@ def get_history(name):
 def get_eft_history(name):
     history = []
     date = datetime.now().date()
-    curr_date = "{}/{}/{}".format("{0:0=2d}".format(date.day), "{0:0=2d}".format(date.month), "{0:0=2d}".format(date.year))
+    curr_date = "{}/{}/{}".format(date.day, date.month, date.year)
     df = ipy.etfs.get_etf_historical_data(etf=name,
                                         country='United States',
-                                        from_date='09/01/2020',
+                                        from_date='01/01/2021',
                                         to_date=curr_date, interval="Weekly")
     if df is not None:
-        for (index, price) in enumerate(df[::-1]):
+        for (index, price) in enumerate(df.iterrows()):
             x = df.iloc[[index]]
             date = x.index.date[0].strftime("%m-%d-%Y")
             pr = x.loc[date, "High"]
             history.append([date, pr])
-    h = history[::-1]
+    h = history
     return h
 
 def get_value_stocks(input):
