@@ -113,7 +113,7 @@ def get_growth_stocks(input):
                     result["stock"]["measures"].append(rateSum/years)
                     result["stock"]["history"][ticker] = get_history(ticker)
 
-                    if len(result["stock"]["names"] == 10):
+                    if len(result["stock"]["names"]) == 10:
                         break
     return result
 """
