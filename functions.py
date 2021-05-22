@@ -123,11 +123,11 @@ def get_history(name):
     series = stocks[name]['history']
 
     if series is not None:
-        for (index, price) in enumerate(series[::-1]):
+        for (index, price) in enumerate(series):
             x = series.iloc[[index]]
             date = x.index.date[0].strftime("%m-%d-%Y")
             history.append([date, price])
-    h = history[::-1]
+    h = history
     return h
 """
     Pass in etf name
@@ -136,6 +136,7 @@ def get_history(name):
 def get_eft_history(name):
     history = []
     date = datetime.now().date()
+
     curr_date = "{}/{}/{}".format("{0:0=2d}".format(date.day), "{0:0=2d}".format(date.month), "{0:0=2d}".format(date.year))
     weekAgo = datetime.now() - dt.timedelta(days=7)
     week_ago = "{}/{}/{}".format("{0:0=2d}".format(weekAgo.day), "{0:0=2d}".format(weekAgo.month), "{0:0=2d}".format(weekAgo.year))
@@ -157,6 +158,7 @@ def get_eft_history(name):
             pr = obj["high"]
             history.append([date, pr])
     return history
+
 
 def get_value_stocks(input):
     # from the list of stocks, return top three and amount to each stocks
