@@ -24,9 +24,26 @@ def getSuggestions(input):
                 elif list(temp.keys())[0] not in result:
                     result.update(temp)
                 else:
-                    curTickers = result[temp.keys()[0]]["names"]
-                    toAddTickers = temp[temp.keys()[0]]["names"]
-                    result[temp.keys()[0]]["names"] = list(set(curTickers + toAddTickers))
+                    curProduct = list(temp.keys())[0]
+                    curTickers = result[curProduct]["names"]
+                    toAddTickers = temp[curProduct]["names"]
+
+                    curMeasures = result[curProduct]["measures"]
+                    toAddMeasures = temp[curProduct]["measures"]
+
+                    curHistory = result[curProduct]["history"]
+                    toAddHistory = temp[curProduct]["history"]
+                    for i in range(len(toAddTickers)):
+                        ticker = toAddTickers[i]
+                        if ticker in curTickers:
+                            index = curTickers.index(ticker)
+                            curMeasures[index] = curMeasures[index] + toAddMeasures[i]
+                        else:
+                            curTickers.append(ticker)
+                            curMeasures.append(toAddMeasures[i])
+                            curHistory[ticker] = toAddHistory[ticker]
+
+
     for key in result:
         result[key]["spend"] = (int)(input["amount"]) / len(result.keys())
     print(result)
