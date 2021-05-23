@@ -43,10 +43,17 @@ def getSuggestions(input):
                             curMeasures.append(toAddMeasures[i])
                             curHistory[ticker] = toAddHistory[ticker]
 
-
+    allsum = 0
     for key in result:
-        result[key]["spend"] = (int)(input["amount"]) / len(result.keys())
-    print(result)
+        productRateAve = 0
+        productRateSum = sum(result[key]["measures"])
+        productRateAve = 0 if len(result[key]["measures"]) == 0 else productRateSum / len(result[key]["measures"])
+        result[key]["rate_ave"] = productRateAve
+        result[key]["rate_sum"] = productRateSum
+        result[key]["ratio"] = [(0 if productRateSum == 0 else tickerRate/productRateSum) for tickerRate in result[key]["measures"]]
+        allsum += productRateAve
+    for key in result:
+        result[key]["spend"] = 0 if allsum == 0 else round((int)(input["amount"]) * (result[key]["rate_ave"] / allsum) , 2)
     return result
 
 
@@ -91,6 +98,7 @@ def get_growth_stocks(input):
     result={
         "stock": {
             "names" : [],
+            "full_names" : [],
             "measures" : [],
             "history": {}
         },
@@ -112,6 +120,7 @@ def get_growth_stocks(input):
                         rateSum += ((prevYear - prevPrev) / prevPrev)
                 if qualified:
                     result["stock"]["names"].append(ticker)
+                    result["stock"]["full_names"].append("" if "shortName" not in stocks[ticker]["info"] else stocks[ticker]["info"]["shortName"])
                     result["stock"]["measures"].append(rateSum/years)
                     result["stock"]["history"][ticker] = get_history(ticker)
 
@@ -169,6 +178,7 @@ def get_value_stocks(input):
     ret={
         "stock": {
             "names" : [],
+            "full_names": [],
             "measures" : [],
             "history": {}
         },
@@ -227,6 +237,7 @@ def get_value_stocks(input):
                 else:
                     measures[i] = 0.2
         ret['stock']['names'] =  val_stock
+        ret["stock"]["full_names"] = [ ("" if "shortName" not in stocks[n]["info"] else stocks[n]["info"]["shortName"]) for n in val_stock]
         ret['stock']['measures'] = measures[:]
     elif (useStock):
         if smallestPeg == 99999999999:
@@ -238,6 +249,7 @@ def get_value_stocks(input):
                 else:
                     measures[i] = 0.15
         ret['stock']['names'] =  val_stock
+        ret["stock"]["full_names"] = [ ("" if "shortName" not in stocks[n]["info"] else stocks[n]["info"]["shortName"]) for n in val_stock]
         ret['stock']['measures'] = measures[:]
     # print(ret)
     return ret
@@ -293,6 +305,7 @@ def get_ethical_stocks(input):
     result={
         "stock": {
             "names" : [],
+            "full_names": [],
             "measures" : [],
             "history": {},
         },
@@ -328,6 +341,7 @@ def get_ethical_stocks(input):
     for stock_ticker, recommendation_score in sorted_recommendation_score_list:
         if count < 3:
             result["stock"]["names"].append(stock_ticker)
+            result["stock"]["full_names"].append("" if "shortName" not in stocks[stock_ticker]["info"] else stocks[stock_ticker]["info"]["shortName"])
             result["stock"]["measures"].append(recommendation_score)
             result["stock"]["history"][stock_ticker] = get_history(stock_ticker)
             count = count + 1 
