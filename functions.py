@@ -81,7 +81,6 @@ def get_growth_etfs(input):
     
     etf_symbol = [list(pair.keys())[0] for pair in etf]
     names = get_etf_names_by_symbols(etf_symbol)
-    print(names)
     
     for i in range(len(etf_symbol)):
         if names[i] != None:
@@ -91,7 +90,6 @@ def get_growth_etfs(input):
             percent = pow(percent, 1/3)
             result["ETF"]["measures"].append(percent)
             result["ETF"]["history"][names[i]] = get_eft_history(names[i])
-    print (result)
     return result
 
 def get_growth_stocks(input):
@@ -347,8 +345,6 @@ def get_ethical_stocks(input):
             count = count + 1 
         else: 
             break
-    print("ethical stocks result:")
-    print(result) 
     return result
 
 
@@ -401,8 +397,6 @@ def get_ethical_etfs(input):
             ret["ETF"]["measures"].append(recommendation_score)
             ret["ETF"]["history"][etf_ticker] = get_history(etf_ticker)
             count = count + 1 
-    print("ethical ETFs result:")
-    print(ret) 
     return ret
 
 
@@ -410,7 +404,9 @@ def get_index_stocks(input):
     res = {
         "stock": {
             "names" : [],
+            "full_names": [],
             "measures" : [],
+            "history": {}
         },
     }
     '''
@@ -431,7 +427,6 @@ def get_index_stocks(input):
     '''
     tickers = ['FNILX', 'SWPPX', 'SWTSX', 'VTSAX', 'FZROX', 'FSKAX', 'VRTTX', 'WFIVX']
     #tickers = list(stocks.keys())
-    print (tickers)
 
     products = input['products'].split(',')
     useStock = 'stock' in products
@@ -444,7 +439,6 @@ def get_index_stocks(input):
         stock = yf.Ticker(ticker)
         info = stock.info
         if 'annualReportExpenseRatio' in info and info['annualReportExpenseRatio'] is not None:
-            print (f'ticker has annualReportExpenseRatio: {ticker}, annualReportExpenseRatio is {info["annualReportExpenseRatio"]}')
             if info['annualReportExpenseRatio'] <= 0.01:
                 stock_dic[ticker] = info['annualReportExpenseRatio']
             
@@ -455,10 +449,6 @@ def get_index_stocks(input):
             if (s[1] == 0):
                 measures.append(0.00001) 
             measures.append(s[1])  
-    print (selected_tickers) 
-    print (measures)      
-
-    print (f'number of select tickers is {len(selected_tickers)}')
     if (useStock and useETF) :
         selected_tickers.pop()
         measures.pop()
@@ -467,7 +457,6 @@ def get_index_stocks(input):
     elif (useStock):
         res["stock"]["names"] = selected_tickers
         res["stock"]["measures"] =  measures
-    print (res)
     return res
 
 def get_index_etfs(input):
@@ -495,10 +484,11 @@ def get_index_etfs(input):
             res["ETF"]["history"][etf[i]] = get_eft_history(names[i])
     return res    
 
-def get_quality_stocks(intput):
+def get_quality_stocks(input):
     res={
         "stock": {
             "names" : [],
+            "full_names": [],
             "measures" : [],
             "history" : {},
         },
@@ -507,7 +497,6 @@ def get_quality_stocks(intput):
     #https://www.risk.net/definition/quality-factor#:~:text=The%20quality%20factor%20refers%20to,over%20a%20long%20time%20horizon.&text=Quality%2Dbased%20strategies%20try%20to,stocks%20versus%20low%2Dquality%20stocks.
     # use payoutRatio as metric, the higher the better
     selected_stocks = {}
-    print (list(stocks.keys()))
     for ticker in [key for key in stocks.keys() if key != "date"]:
 
         stock = stocks[ticker]
@@ -522,6 +511,7 @@ def get_quality_stocks(intput):
     sort_stocks = sorted(selected_stocks.items(), key=lambda x: x[1], reverse=True)
     for s in sort_stocks:
         res["stock"]["names"].append(s[0])
+        res["stock"]["full_names"].append("" if "shortName" not in stocks[s[0]]["info"] else stocks[s[0]]["info"]["shortName"])
         res["stock"]["measures"].append(s[1])
         res["stock"]["history"][s[0]] = get_history(s[0])
     return res
@@ -544,18 +534,14 @@ def get_quality_etfs(input):
         if len(selected_etfs) <=2:
             selected_etfs.append(e[0])
             measures.append(measures[len(selected_etfs) - 1])  
-    print (selected_etfs) 
-    print (measures)  
 
     names = get_etf_names_by_symbols(selected_etfs)
-    print (names)
 
     for i in range(len(selected_etfs)):
         if names[i] != None:
             res["ETF"]["names"].append(selected_etfs[i])
             res["ETF"]["measures"].append(measures[i])
             res["ETF"]["history"][selected_etfs[i]] = get_eft_history(names[i])
-    print (res)
     return res
 
 handlerMap = {
