@@ -294,33 +294,25 @@ def get_ethical_stocks(input):
         "stock": {
             "names" : [],
             "measures" : [],
+            "history": {},
         },
     }
-
-
-    # result["stock"]["names"].append('MSFT')
-    # print(stocks.keys())
-    # print(stocks['date'])
-    # for x, y in stocks.items():
-    #     print("key")
-    #     print(x)
-    #     print("value")
-    #     print(y)
-
     
     ethical_stock_tickers_top10 = ['MSFT', 'INTC', 'GOOGL', 'IBM', 'ACN', 'T', 'GM', 'GIS', 'AAPL', 'RMD']
 
     # recommendation score = 10 * past year percentage change + 5 * past 6-month percentage change + 3 * past 3-month percentage change
     recommendation_score_list = {}
     for ticker in ethical_stock_tickers_top10:
-        tk = yf.Ticker(ticker)
-        history = tk.history(period='1y')
-        today_data = tk.history(period='1d')
-        current_price = round(today_data['Close'][0], 2)
-        total_rows = history.shape[0] 
-        prev_year_price = history.iloc[0]['Close']
-        prev_6month_price = history.iloc[round(total_rows * 0.5)]['Close']
-        prev_3month_price = history.iloc[round(total_rows * 0.75)]['Close']         
+        if ticker not in stocks:
+            continue
+        tk = stocks[ticker]
+        history = tk["history"]
+        today_data = history.iloc[-1:]
+        current_price = round(today_data.values[0], 2)
+        total_rows = len(history)
+        prev_year_price = round(history.iloc[0], 2)
+        prev_6month_price = round(history.iloc[round(total_rows * 0.5)], 2)
+        prev_3month_price = round(history.iloc[round(total_rows * 0.75)], 2)         
         past_year_percetage_change = (current_price - prev_year_price) / prev_year_price
         past_6month_percentage_change = (current_price - prev_6month_price) / prev_6month_price 
         past_3month_percentage_change = (current_price - prev_3month_price) / prev_3month_price 
@@ -329,18 +321,20 @@ def get_ethical_stocks(input):
     
     # sort recommendation score in descending order
     sorted_recommendation_score_list= sorted(recommendation_score_list.items(), key=lambda x: x[1], reverse=True)
-    print("sorted list")
-    print(sorted_recommendation_score_list)
+  
 
     # output top 3 stock recommendations
     count = 0
-    for stock_ticker, recommendation_score in sorted(recommendation_score_list.items(), key=lambda x: x[1], reverse=True):
+    for stock_ticker, recommendation_score in sorted_recommendation_score_list:
         if count < 3:
             result["stock"]["names"].append(stock_ticker)
+            result["stock"]["measures"].append(recommendation_score)
+            result["stock"]["history"][stock_ticker] = get_history(stock_ticker)
             count = count + 1 
+        else: 
+            break
     print("ethical stocks result:")
     print(result) 
-    
     return result
 
 
@@ -354,6 +348,8 @@ def get_ethical_etfs(input):
     ret={
         "ETF": {
             "names" : [],
+            "measures": [],
+            "history": {},
         },
     }
 
@@ -363,14 +359,16 @@ def get_ethical_etfs(input):
     # recommendation score = 10 * past year percentage change + 5 * past 6-month percentage change + 3 * past 3-month percentage change
     recommendation_score_list = {}
     for ticker in ethical_etf_tickers_top10:
-        tk = yf.Ticker(ticker)
-        history = tk.history(period='1y')
-        today_data = tk.history(period='1d')
-        current_price = round(today_data['Close'][0], 2)
-        total_rows = history.shape[0] 
-        prev_year_price = history.iloc[0]['Close']
-        prev_6month_price = history.iloc[round(total_rows * 0.5)]['Close']
-        prev_3month_price = history.iloc[round(total_rows * 0.75)]['Close']         
+        if ticker not in stocks:
+            continue
+        tk = stocks[ticker]
+        history = tk["history"]
+        today_data = history.iloc[-1:]
+        current_price = round(today_data.values[0], 2)
+        total_rows = len(history)
+        prev_year_price = round(history.iloc[0], 2)
+        prev_6month_price = round(history.iloc[round(total_rows * 0.5)], 2)
+        prev_3month_price = round(history.iloc[round(total_rows * 0.75)], 2)         
         past_year_percetage_change = (current_price - prev_year_price) / prev_year_price
         past_6month_percentage_change = (current_price - prev_6month_price) / prev_6month_price 
         past_3month_percentage_change = (current_price - prev_3month_price) / prev_3month_price 
@@ -379,18 +377,18 @@ def get_ethical_etfs(input):
     
     # sort recommendation score in descending order
     sorted_recommendation_score_list= sorted(recommendation_score_list.items(), key=lambda x: x[1], reverse=True)
-    print("sorted list")
-    print(sorted_recommendation_score_list)
+    
 
     # output top 3 ETF recommendations
     count = 0
-    for etf_ticker, recommendation_score in sorted(recommendation_score_list.items(), key=lambda x: x[1], reverse=True):
+    for etf_ticker, recommendation_score in sorted_recommendation_score_list:
         if count < 3:
             ret["ETF"]["names"].append(etf_ticker)
+            ret["ETF"]["measures"].append(recommendation_score)
+            ret["ETF"]["history"][etf_ticker] = get_history(etf_ticker)
             count = count + 1 
     print("ethical ETFs result:")
     print(ret) 
-    
     return ret
 
 
