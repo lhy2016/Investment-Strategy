@@ -33,9 +33,9 @@
                 }
                 console.log(stock_date)
                 
-                var r =  Math.floor(Math.random() * 220);
-                var g = Math.floor(Math.random() * 220);
-                var b = Math.floor(Math.random() * 220);
+                var r =  Math.floor(Math.random() * 230);
+                var g = Math.floor(Math.random() * 230);
+                var b = Math.floor(Math.random() * 230);
                 var rgbStr = "rgb(" + r + ", " + g + ", " + b + ")" 
 
                 let data = {
@@ -55,8 +55,19 @@
                         plugins: {
                             title: {
                                 display: false,
+                            },
+                            legend: {
+                                display: false
+                            },
+                            tooltips: {
+                                callbacks: {
+                                label: function(tooltipItem) {
+                                        return tooltipItem.yLabel;
+                                }
+                                }
                             }
-                        }
+                        },
+                        
                     }
                 }
                 console.log(config);
