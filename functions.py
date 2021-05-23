@@ -481,6 +481,37 @@ def get_index_etfs(input):
             res["ETF"]["history"][etf[i]] = get_eft_history(names[i])
     return res    
 
+def get_quality_stocks(intput):
+    res={
+        "stock": {
+            "names" : [],
+            "measures" : [],
+            "history" : {},
+        },
+    }
+
+    #https://www.risk.net/definition/quality-factor#:~:text=The%20quality%20factor%20refers%20to,over%20a%20long%20time%20horizon.&text=Quality%2Dbased%20strategies%20try%20to,stocks%20versus%20low%2Dquality%20stocks.
+    # use payoutRatio as metric, the higher the better
+    selected_stocks = {}
+    print (list(stocks.keys()))
+    for ticker in [key for key in stocks.keys() if key != "date"]:
+
+        stock = stocks[ticker]
+        if 'info' in stock:
+            info = stock['info']
+            if 'payoutRatio' in info:
+                payoutRatio = info['payoutRatio']
+                if  payoutRatio is not None and payoutRatio >= 0.35:
+                    selected_stocks[ticker] = payoutRatio
+            if len(selected_stocks) > 2:
+                break
+    sort_stocks = sorted(selected_stocks.items(), key=lambda x: x[1], reverse=True)
+    for s in sort_stocks:
+        res["stock"]["names"].append(s[0])
+        res["stock"]["measures"].append(s[1])
+        res["stock"]["history"][s[0]] = get_history(s[0])
+    return res
+
 def get_quality_etfs(input):
     res={
         "ETF": {
@@ -517,7 +548,7 @@ handlerMap = {
     "stock":{
         "ethical": get_ethical_stocks,
         "growth": get_growth_stocks,
-        "quality": None,
+        "quality": get_quality_stocks,
         "index": get_index_etfs,
         "value": get_value_stocks,
     },
