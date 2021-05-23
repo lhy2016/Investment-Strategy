@@ -38,6 +38,7 @@ def grab_all_stocks():
 
 stocks = {}
 delisted = ["BRK.B", "MOG.A", "JW.A", "TPRE", "BF.B"]
+etfs = ['KGRN', 'ACES', 'ICLN', 'TAN', 'SMOG', 'CTEC', 'QCLN', 'RNRG', 'FAN', 'SDG']
 
 def update():
     while True:    
@@ -52,11 +53,12 @@ def update():
                 stocks["date"] = todayStr
                 tickers = grab_all_stocks()
                 tickers = [*tickers["small"], *tickers["medium"], *tickers["large"]]
+                tickers = tickers + etfs
                 tickers = list(set(tickers))
                 tickers = [x for x in tickers if x not in delisted]
                 tickerStr = " ".join(tickers)
 
-                data = yf.download(tickerStr, period="1y", interval="1wk",threads=True, group_by='tickers')
+                data = yf.download(tickerStr, period="1y", interval="1d",threads=True, group_by='tickers')
                 for ticker in tickers:
                     stocks[ticker] = {}
                     updated = data.loc[:, (ticker, "High")].dropna()
@@ -73,9 +75,9 @@ def update():
                 for ticker in stocks.keys():
                     if ticker != "date":
                         tickerObj = yf.Ticker(ticker)
-                        updated = tickerObj.history(period="1y", interval="1wk")
+                        updated = tickerObj.history(period="1y", interval="1d")
                         if (len(updated) > 0):
-                            stocks[ticker]["history"] = updated
+                            stocks[ticker]["history"] = updated["High"]
                             stocks[ticker]["quarterly_earnings"] = tickerObj.quarterly_earnings
                             stocks[ticker]["info"] = tickerObj.info
                             stocks[ticker]["earnings"] = tickerObj.earnings
