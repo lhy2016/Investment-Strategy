@@ -74,6 +74,7 @@ def get_growth_etfs(input):
     
     etf_symbol = [list(pair.keys())[0] for pair in etf]
     names = get_etf_names_by_symbols(etf_symbol)
+    print(names)
     
     for i in range(len(etf_symbol)):
         if names[i] != None:
@@ -83,6 +84,7 @@ def get_growth_etfs(input):
             percent = pow(percent, 1/3)
             result["ETF"]["measures"].append(percent)
             result["ETF"]["history"][names[i]] = get_eft_history(names[i])
+    print (result)
     return result
 
 def get_growth_stocks(input):
@@ -171,7 +173,7 @@ def get_value_stocks(input):
             "history": {}
         },
     }
-    # print(stocks)
+    #print(stocks)
     ticker = random.choice(list(stocks.keys()))
     products = input['products'].split(',')
     useStock = 'stock' in products
@@ -459,6 +461,7 @@ def get_index_etfs(input):
         "ETF": {
             "names" : [],
             "measures" : [],
+            "history" : {},
         },
     }
     '''
@@ -468,31 +471,60 @@ def get_index_etfs(input):
     IVV: expense ratio = 0.03%
     '''
     etf = ['VOO', 'SPY', 'IVV']
-    measures = [0.0003, 0.0009, 0.0003]
-    products = input['products'].split(',')
-    useStock = 'stock' in products
-    useETF = 'etf' in products
-    if (useStock and useETF) :
-        res["ETF"]["names"] = etf[2:]
-        res["ETF"]["measures"] =  measures[2:]
-    elif (useETF):
-        res["ETF"]["names"] = etf
-        res["ETF"]["measures"] = measures
-    print (res)
+    names = get_etf_names_by_symbols(etf)
+    measures = [0.4, 0.2, 0.4]
+
+    for i in range(len(etf)):
+        if names[i] != None:
+            res["ETF"]["names"].append(etf[i])
+            res["ETF"]["measures"].append(measures[i])
+            res["ETF"]["history"][etf[i]] = get_eft_history(names[i])
     return res    
+
+def get_quality_etfs(input):
+    res={
+        "ETF": {
+            "names" : [],
+            "measures" : [],
+            "history" : {},
+        },
+    }
+    #https://www.etf.com/sections/features-and-news/dissecting-3-big-quality-etfs
+    #https://www.nasdaq.com/articles/5-solid-quality-etfs-to-buy-now-2021-03-26
+    selected_etfs = []
+    etf = {"QUAL": 0.1658, "SPHQ": 0.1565, "DGRW": 0.1659, "QDF": 0.1291, "IQLT": 0.1197, "IQDF": 0.088599995, "BFOR":0.1524, "QDF":0.1291, "QUS": 0.16420001}
+    sort_etfs = sorted(etf.items(), key=lambda x: x[1], reverse=True)
+    measures = [0.5, 0.3, 0.2]
+    for e in sort_etfs:
+        if len(selected_etfs) <=2:
+            selected_etfs.append(e[0])
+            measures.append(measures[len(selected_etfs) - 1])  
+    print (selected_etfs) 
+    print (measures)  
+
+    names = get_etf_names_by_symbols(selected_etfs)
+    print (names)
+
+    for i in range(len(selected_etfs)):
+        if names[i] != None:
+            res["ETF"]["names"].append(selected_etfs[i])
+            res["ETF"]["measures"].append(measures[i])
+            res["ETF"]["history"][selected_etfs[i]] = get_eft_history(names[i])
+    print (res)
+    return res
 
 handlerMap = {
     "stock":{
         "ethical": get_ethical_stocks,
         "growth": get_growth_stocks,
         "quality": None,
-        "index": get_index_stocks,
+        "index": get_index_etfs,
         "value": get_value_stocks,
     },
     "etf": {
         "ethical": get_ethical_etfs,
         "growth": get_growth_etfs,
-        "quality": None,
+        "quality": get_quality_etfs,
         "index": get_index_etfs,
         "value": get_value_eft,
     },
