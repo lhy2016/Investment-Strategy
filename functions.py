@@ -122,14 +122,13 @@ def get_growth_stocks(input):
 def get_history(name):
     history = []
     series = stocks[name]['history']
-
     if series is not None:
-        for (index, price) in enumerate(series[::-1]):
-            x = series.iloc[[index]]
+        for i in range(min(len(series), 7)):
+            x = series.iloc[[-(i+1)]]
             date = x.index.date[0].strftime("%m-%d-%Y")
+            price = x.values[0]
             history.append([date, price])
-    h = history[::-1]
-    return h
+    return history
 """
     Pass in etf name
     returns array formatted for chart.js
@@ -148,7 +147,6 @@ def get_eft_history(name):
     if jsonStr:
         jsonObj = json.loads(jsonStr)
         for obj in jsonObj["historical"]:
-            print(obj)
             dateStr = obj["date"]
             dateArr = dateStr.split("/")
             mon = dateArr[1]
