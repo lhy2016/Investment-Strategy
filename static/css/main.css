@@ -55,3 +55,23 @@ body {
     border-radius: 5px;
     padding: 15px;
 }
+#stockSpend {
+    margin: 12px 0px;
+    padding: 15px;
+    background-color: #f1b2b2;
+    border-radius: 5px;
+}
+#etfSpend {
+    margin: 12px 0px;
+    padding: 15px;
+    background-color: #96cfcc;
+    border-radius: 5px;
+}
+.spendTitle {
+    display: inline-block;
+    margin: 12px 0px;
+    padding: 15px;
+    background-color: #dadada;
+    border-radius: 5px;
+    color: #575757;
+}

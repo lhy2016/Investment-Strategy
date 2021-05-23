@@ -33,12 +33,17 @@
                 }
                 console.log(stock_date)
                 
+                var r =  Math.floor(Math.random() * 220);
+                var g = Math.floor(Math.random() * 220);
+                var b = Math.floor(Math.random() * 220);
+                var rgbStr = "rgb(" + r + ", " + g + ", " + b + ")" 
+
                 let data = {
                     labels: stock_date,
                     datasets: [{
                         label: `${name} Price`,
-                        backgroundColor: 'rgb(255, 99, 132)',
-                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: rgbStr,
+                        borderColor: rgbStr,
                         data: price,
                     }]
                 }
@@ -49,8 +54,7 @@
                     options: {
                         plugins: {
                             title: {
-                                display: true,
-                                text: `${name} Price Chart`
+                                display: false,
                             }
                         }
                     }
@@ -127,15 +131,21 @@
                 </form>
             </div>
             {% if items is defined %}
-                <div id="suggest-intro">Since you plan to spend <b>${{items['amount']}}</b>, and you like <b>{{items['strat1']}} investing</b>{% if items['strat2'] is defined %}
+                {% set products = items['products'].split(",") %}
+                <div id="suggest-intro">Since you plan to invest <b>${{items['amount']}}</b> on <b>{{products[0]}}</b>{% if products|length >= 2%} and  <b>{{products[1]}}</b>{% endif %}, and you like <b>{{items['strat1']}} investing</b>{% if items['strat2'] is defined %}
                         and <b>{{items['strat2']}} investing{% endif %}</b>, we suggest you......
                 </div>
                 <div class="row">
                     {% if 'stock' in items['suggestion'] %}
                     <div class="col-md-6" id="stock-panel">
-                        Spend ${{items['suggestion']['stock']['spend']}} on these stocks...
+                        <div id="stockSpend">Spend <b>${{items['suggestion']['stock']['spend']}}</b> on these stocks...</div>
                         
                         {%for name in items['suggestion']['stock']['names'] %}
+
+                            <span class="spendTitle">Spend <b>${{(items['suggestion']['stock']['spend'] * items['suggestion']['stock']['ratio'][loop.index0])|round(2)}}</b>
+                                {% set full_name = items['suggestion']['stock']['full_names'][loop.index0] %}
+                                on <b>{{ (full_name + " ("+name+")" ) if full_name != "" else name}}</b>
+                            </span>
                             <canvas id={{name}} width="600" height="400"></canvas>
                             <script>
                                 createChart2('{{name}}', '{{items["suggestion"]["stock"]["history"][name]|tojson}}', '{{name}}');
@@ -145,12 +155,12 @@
                     {% endif %}
                     {% if 'ETF' in items['suggestion'] %}
                     <div class="col-md-6" id="etf-panel">
-                        Spend ${{items['suggestion']['ETF']['spend']}} on these ETFs...
-                        <br/>
+                        <div id="etfSpend">Spend <b>${{items['suggestion']['ETF']['spend']}}</b> on these ETFs...</div>
                         {%for name in items['suggestion']['ETF']['names'] %}
-                            {{name}}
+                            <span class="spendTitle">Spend <b>${{(items['suggestion']['ETF']['spend'] * items['suggestion']['ETF']['ratio'][loop.index0])|round(2)}}</b>
+                                on <b>{{name}}</b>
+                            </span>
                             {% set dash = "_".join(name.split(" ")) %}
-
                             <canvas id={{dash}} width="600" height="400"></canvas>
                             <script>
                                 createChart2('{{name}}', '{{items["suggestion"]["ETF"]["history"][name]|tojson}}', '{{dash}}');

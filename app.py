@@ -19,12 +19,14 @@ def query():
     
     viewItems = {}
     strats = request.form['strats'].split(",")
+    products = request.form['products']
     strat1 = strats[0]
     viewItems['amount'] = request.form['amount']
     viewItems['strat1'] = strat1
     if (len(strats) == 2):
         viewItems['strat2'] = strats[1]
     viewItems['suggestion'] = suggestion
+    viewItems['products'] = products
     return render_template('main.html', items=viewItems)
 
 if __name__ == '__main__':
