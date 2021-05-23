@@ -128,7 +128,7 @@ def get_history(name):
             date = x.index.date[0].strftime("%m-%d-%Y")
             price = x.values[0]
             history.append([date, price])
-    return history
+    return history[::-1]
 """
     Pass in etf name
     returns array formatted for chart.js

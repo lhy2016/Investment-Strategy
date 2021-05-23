@@ -24,7 +24,6 @@
                 var parsed = JSON.parse(data_json)
                 let price = [];
                 let stock_date = [];
-              
                 for(var i = 0; i < parsed.length;i++){
                         // create label
                         stock_date.push(parsed[i][0]);
@@ -32,7 +31,7 @@
                         price.push(parsed[i][1]);
                     
                 }
-            
+                console.log(stock_date)
                 
                 let data = {
                     labels: stock_date,
