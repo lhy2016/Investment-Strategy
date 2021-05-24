@@ -208,6 +208,7 @@ def get_value_stocks(input):
             info = s['info']
             if "marketCap" not in info:
                 ticker = random.choice(list(stocks.keys()))
+                continue
             if info['marketCap'] > 2000000000:
                 if 'profitMargins' in info and info['profitMargins'] is not None and info['profitMargins'] >= 0.2:
                     value_tick += 1
