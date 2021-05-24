@@ -157,6 +157,7 @@
                                 {% set full_name = items['suggestion']['stock']['full_names'][loop.index0] %}
                                 on <b>{{ (full_name + " ("+name+")" ) if full_name != "" else name}}</b>
                             </span>
+                            <div>Current: <b>{{items['suggestion']['stock']['current'][loop.index0]|round(2)}}</b> <span style="color: grey"> (updated 1 min ago)</span></div>
                             <canvas id={{name}} width="600" height="400"></canvas>
                             <script>
                                 createChart2('{{name}}', '{{items["suggestion"]["stock"]["history"][name]|tojson}}', '{{name}}');
@@ -171,6 +172,7 @@
                             <span class="spendTitle">Spend <b>${{(items['suggestion']['ETF']['spend'] * items['suggestion']['ETF']['ratio'][loop.index0])|round(2)}}</b>
                                 on <b>{{name}}</b>
                             </span>
+                            <div>Current: <b>{{items['suggestion']['ETF']['history'][name][-1][1]|round(2)}}</b> <span style="color: grey"> (updated 1 min ago)</span></div>
                             {% set dash = "_".join(name.split(" ")) %}
                             <canvas id={{dash}} width="600" height="400"></canvas>
                             <script>

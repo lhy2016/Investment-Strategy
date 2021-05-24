@@ -54,6 +54,13 @@ def getSuggestions(input):
         allsum += productRateAve
     for key in result:
         result[key]["spend"] = 0 if allsum == 0 else round((int)(input["amount"]) * (result[key]["rate_ave"] / allsum) , 2)
+        if key == "stock":
+            result[key]["current"] = []
+            for name in result[key]["names"]:
+                ticker = yf.Ticker(name)
+                history = ticker.history(period="1d", interval="1m")
+                lastMin = history.iloc[-1]['Close']
+                result[key]["current"].append(lastMin)
     return result
 
 
