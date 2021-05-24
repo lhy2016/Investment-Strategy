@@ -27,6 +27,9 @@ def getSuggestions(input):
                     curProduct = list(temp.keys())[0]
                     curTickers = result[curProduct]["names"]
                     toAddTickers = temp[curProduct]["names"]
+                    
+                    curFullNames = result[curProduct]["full_names"] if curProduct == "stock" else None
+                    toAddFullNames = temp[curProduct]["full_names"] if curProduct == "stock" else None
 
                     curMeasures = result[curProduct]["measures"]
                     toAddMeasures = temp[curProduct]["measures"]
@@ -40,6 +43,8 @@ def getSuggestions(input):
                             curMeasures[index] = curMeasures[index] + toAddMeasures[i]
                         else:
                             curTickers.append(ticker)
+                            if curProduct == "stock":
+                                curFullNames.append(toAddFullNames[i])
                             curMeasures.append(toAddMeasures[i])
                             curHistory[ticker] = toAddHistory[ticker]
 
@@ -201,6 +206,8 @@ def get_value_stocks(input):
         value_tick = 0
         if 'info' in s:
             info = s['info']
+            if "marketCap" not in info:
+                ticker = random.choice(list(stocks.keys()))
             if info['marketCap'] > 2000000000:
                 if 'profitMargins' in info and info['profitMargins'] is not None and info['profitMargins'] >= 0.2:
                     value_tick += 1
